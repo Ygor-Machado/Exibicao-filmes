@@ -37,6 +37,16 @@ if($type === "register") {
                 $userToken = $user->generateToken();
                 $finalPassword = $user->generatePassword($password);
 
+                $user->name = $name;
+                $user->lastname = $lastname;
+                $user->email = $email;
+                $user->password = $finalPassword;
+                $user->token = $userToken;
+
+                $auth = true;
+
+                $userDAO->create($user, $auth);
+
             } else {
                 $message->setMessage("Usuario já cadastrado, tente outro email", "error", "back");
             }
