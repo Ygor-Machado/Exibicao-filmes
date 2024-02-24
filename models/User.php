@@ -33,6 +33,6 @@ interface UserDAOInterface {
     public function findById($id);
     public function verifyToken($protected = false);
     public function setTokenToSession($token, $redirect = true);
-    public function authenticate($email, $password);
+    public function authenticateUser($email, $password);
     public function changePassword(User $user);
 }
