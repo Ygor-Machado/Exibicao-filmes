@@ -8,28 +8,41 @@
     $movieDAO = new MovieDAO($conn, $BASE_URL);
 
     $latestMovies = $movieDAO->getLatestMovies();
-    $actionMovies = [];
-    $comedyMovies = [];
+    $actionMovies = $movieDAO->getMoviesByCategory("Ação");
+    $comedyMovies = $movieDAO->getMoviesByCategory("Comédia");
 ?>
 
 <div id="main-container" class="container-fluid">
-    <h2 id="section-title">Filmes Novos</h2>
+    <h2 class="section-title">Filmes novos</h2>
     <p class="section-description">Veja as críticas dos últimos filmes adicionados no MovieStar</p>
-
     <div class="movies-container">
         <?php foreach($latestMovies as $movie): ?>
             <?php require("templates/movie_card.php"); ?>
         <?php endforeach; ?>
+        <?php if(count($latestMovies) === 0): ?>
+            <p class="empty-list">Ainda não há filmes cadastrados!</p>
+        <?php endif; ?>
     </div>
-    <div class="movies-container">
-    </div>
-    <h2 id="section-title">Ação</h2>
+    <h2 class="section-title">Ação</h2>
     <p class="section-description">Veja os melhores filmes de ação</p>
-
-    <div class="movies-container"></div>
-    <h2 id="section-title">Comédia</h2>
+    <div class="movies-container">
+        <?php foreach($actionMovies as $movie): ?>
+            <?php require("templates/movie_card.php"); ?>
+        <?php endforeach; ?>
+        <?php if(count($actionMovies) === 0): ?>
+            <p class="empty-list">Ainda não há filmes de ação cadastrados!</p>
+        <?php endif; ?>
+    </div>
+    <h2 class="section-title">Comédia</h2>
     <p class="section-description">Veja os melhores filmes de comédia</p>
-
+    <div class="movies-container">
+        <?php foreach($comedyMovies as $movie): ?>
+            <?php require("templates/movie_card.php"); ?>
+        <?php endforeach; ?>
+        <?php if(count($comedyMovies) === 0): ?>
+            <p class="empty-list">Ainda não há filmes de comédia cadastrados!</p>
+        <?php endif; ?>
+    </div>
 </div>
 
 <?php
