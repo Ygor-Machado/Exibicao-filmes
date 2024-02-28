@@ -76,6 +76,28 @@ if($type === "create") {
         $message->setMessage("Preencha todos os campos obrigatórios(Titulo, descrição e categoria)", "error", "back");
     }
 
+} else if($type === "delete") {
+
+    // Recebe os dados do form
+    $id = filter_input(INPUT_POST, "id");
+
+    $movie = $movieDAO->findById($id);
+
+    if($movie) {
+
+        // Verificar se o filme é do usuário
+        if($movie->users_id === $userData->id) {
+
+            $movieDAO->destroy($id);
+
+        } else {
+            $message->setMessage("Você não tem permissão para deletar este filme", "error", "index.php");
+        }
+
+    } else {
+        $message->setMessage("Filme não encontrado", "error", "index.php");
+    }
+
 } else {
     $message->setMessage("Ação inválida", "error", "index.php");
 }
