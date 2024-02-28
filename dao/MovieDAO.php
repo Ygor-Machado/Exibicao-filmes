@@ -41,7 +41,21 @@ class MovieDAO implements MovieDAOInterface
 
     public function getLatestMovies()
     {
+        $movies = [];
 
+        $stmt = $this->conn->query("SELECT * FROM movies ORDER BY id DESC");
+        $stmt->execute();
+
+        if($stmt->rowCount() > 0) {
+
+            $moviesArray = $stmt->fetchAll();
+
+            foreach ($moviesArray as $movie) {
+                $movies[] = $this->buildMovie($movie);
+            }
+        }
+
+        return $movies;
     }
 
     public function getMoviesByCategory($category)
