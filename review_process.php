@@ -1,24 +1,24 @@
 <?php
 
-    require_once("globals.php");
-    require_once("db.php");
-    require_once("models/Movie.php");
-    require_once("models/Message.php");
-    require_once("models/Review.php");
-    require_once("dao/MovieDAO.php");
-    require_once("dao/UserDAO.php");
-    require_once("dao/ReviewDAO.php");
+require_once("globals.php");
+require_once("db.php");
+require_once("models/Movie.php");
+require_once("models/Review.php");
+require_once("models/Message.php");
+require_once("dao/UserDAO.php");
+require_once("dao/MovieDAO.php");
+require_once("dao/ReviewDAO.php");
 
-    $message = new Message($BASE_URL);
-    $movieDAO = new MovieDAO($conn, $BASE_URL);
-    $userDAO = new UserDAO($conn, $BASE_URL);
-    $reviewDAO = new ReviewDAO($conn, $BASE_URL);
+$message = new Message($BASE_URL);
+$userDao = new UserDAO($conn, $BASE_URL);
+$movieDao = new MovieDAO($conn, $BASE_URL);
+$reviewDao = new ReviewDAO($conn, $BASE_URL);
 
-    // Resgata dados do usúario
-    $userData = $userDAO->verifyToken(true);
+// Recebendo o tipo do formulário
+$type = filter_input(INPUT_POST, "type");
 
-    // Recebendo o tipo do formulário
-    $type = filter_input(INPUT_POST, "type");
+// Resgata dados do usuário
+$userData = $userDao->verifyToken();
 
 if($type === "create") {
 
@@ -30,7 +30,7 @@ if($type === "create") {
 
     $reviewObject = new Review();
 
-    $movieData = $movieDAO->findById($movies_id);
+    $movieData = $movieDao->findById($movies_id);
 
     // Validando se o filme existe
     if($movieData) {
@@ -43,7 +43,7 @@ if($type === "create") {
             $reviewObject->movies_id = $movies_id;
             $reviewObject->users_id = $users_id;
 
-            $reviewDAO->create($reviewObject);
+            $reviewDao->create($reviewObject);
 
         } else {
 
@@ -51,11 +51,14 @@ if($type === "create") {
 
         }
 
-        } else {
-            $message->setMessage("Filme não encontrado", "error", "index.php");
-        }
-
-
     } else {
-        $message->setMessage("Informações inválido", "error", "index.php");
+
+        $message->setMessage("Informações inválidas!", "error", "index.php");
+
     }
+
+} else {
+
+    $message->setMessage("Informações inválidas!", "error", "index.php");
+
+}

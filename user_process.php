@@ -7,24 +7,25 @@ require_once("models/Message.php");
 require_once("dao/UserDAO.php");
 
 $message = new Message($BASE_URL);
-$userDAO = new UserDAO($conn, $BASE_URL);
 
-// Resgata tipo do formulario
+$userDao = new UserDAO($conn, $BASE_URL);
+
+// Resgata o tipo do formulário
 $type = filter_input(INPUT_POST, "type");
 
 // Atualizar usuário
 if($type === "update") {
 
     // Resgata dados do usuário
-    $userData = $userDAO->verifyToken(true);
+    $userData = $userDao->verifyToken();
 
-    // Resgata dados do post
+    // Receber dados do post
     $name = filter_input(INPUT_POST, "name");
     $lastname = filter_input(INPUT_POST, "lastname");
     $email = filter_input(INPUT_POST, "email");
     $bio = filter_input(INPUT_POST, "bio");
 
-    // Criar um novo objeto de usuario
+    // Criar um novo objeto de usuário
     $user = new User();
 
     // Preencher os dados do usuário
@@ -37,48 +38,41 @@ if($type === "update") {
     if(isset($_FILES["image"]) && !empty($_FILES["image"]["tmp_name"])) {
 
         $image = $_FILES["image"];
-        $imageTypes = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
+        $imageTypes = ["image/jpeg", "image/jpg", "image/png"];
         $jpgArray = ["image/jpeg", "image/jpg"];
-        $webpArray = ["image/webp"];
 
         // Checagem de tipo de imagem
         if(in_array($image["type"], $imageTypes)) {
 
             // Checar se jpg
-            if(in_array($image["type"], $jpgArray)) {
+            if(in_array($image, $jpgArray)) {
 
                 $imageFile = imagecreatefromjpeg($image["tmp_name"]);
 
-
-            } else if(in_array($image["type"], $webpArray)) {
-
-                $imageFile = imagecreatefromwebp($image["tmp_name"]);
-
+                // Imagem é png
             } else {
 
                 $imageFile = imagecreatefrompng($image["tmp_name"]);
 
             }
 
-            if ($imageFile !== false) {
+            $imageName = $user->imageGenerateName();
 
-                $imageName = $user->imageGenerateName();
-                imagejpeg($imageFile, "./img/users/" . $imageName, 100);
-                $userData->image = $imageName;
+            imagejpeg($imageFile, "./img/users/" . $imageName, 100);
 
-            } else {
-                $message->setMessage("Erro ao processar a imagem.", "error", "back");
-            }
+            $userData->image = $imageName;
 
         } else {
-            $message->setMessage("Tipo inválido de imagem, insira png, jpg ou webp!", "error", "back");
+
+            $message->setMessage("Tipo inválido de imagem, insira png ou jpg!", "error", "back");
+
         }
+
     }
 
-    $userDAO->update($userData);
+    $userDao->update($userData);
 
-    // Atualizar Senha do usuario
-// Atualizar senha do usuário
+    // Atualizar senha do usuário
 } else if($type === "changepassword") {
 
     // Receber dados do post
@@ -86,7 +80,7 @@ if($type === "update") {
     $confirmpassword = filter_input(INPUT_POST, "confirmpassword");
 
     // Resgata dados do usuário
-    $userData = $userDAO->verifyToken();
+    $userData = $userDao->verifyToken();
 
     $id = $userData->id;
 
@@ -100,7 +94,7 @@ if($type === "update") {
         $user->password = $finalPassword;
         $user->id = $id;
 
-        $userDAO->changePassword($user);
+        $userDao->changePassword($user);
 
     } else {
         $message->setMessage("As senhas não são iguais!", "error", "back");

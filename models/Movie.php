@@ -1,7 +1,7 @@
 <?php
 
-class Movie
-{
+class Movie {
+
     public $id;
     public $title;
     public $description;
@@ -17,8 +17,7 @@ class Movie
 
 }
 
-interface MovieDAOInterface
-{
+interface MovieDAOInterface {
 
     public function buildMovie($data);
     public function findAll();

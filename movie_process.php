@@ -4,18 +4,18 @@ require_once("globals.php");
 require_once("db.php");
 require_once("models/Movie.php");
 require_once("models/Message.php");
-require_once("dao/MovieDAO.php");
 require_once("dao/UserDAO.php");
+require_once("dao/MovieDAO.php");
 
 $message = new Message($BASE_URL);
-$movieDAO = new MovieDAO($conn, $BASE_URL);
-$userDAO = new UserDAO($conn, $BASE_URL);
+$userDao = new UserDAO($conn, $BASE_URL);
+$movieDao = new MovieDAO($conn, $BASE_URL);
 
-// Resgata tipo do formulario
-$type =  filter_input(INPUT_POST, "type");
+// Resgata o tipo do formulário
+$type = filter_input(INPUT_POST, "type");
 
-// Resgata dados do usúario
-$userData = $userDAO->verifyToken(true);
+// Resgata dados do usuário
+$userData = $userDao->verifyToken();
 
 if($type === "create") {
 
@@ -70,10 +70,12 @@ if($type === "create") {
 
         }
 
-        $movieDAO->create($movie);
+        $movieDao->create($movie);
 
     } else {
-        $message->setMessage("Preencha todos os campos obrigatórios(Titulo, descrição e categoria)", "error", "back");
+
+        $message->setMessage("Você precisa adicionar pelo menos: título, descrição e categoria!", "error", "back");
+
     }
 
 } else if($type === "delete") {
@@ -81,24 +83,28 @@ if($type === "create") {
     // Recebe os dados do form
     $id = filter_input(INPUT_POST, "id");
 
-    $movie = $movieDAO->findById($id);
+    $movie = $movieDao->findById($id);
 
     if($movie) {
 
         // Verificar se o filme é do usuário
         if($movie->users_id === $userData->id) {
 
-            $movieDAO->destroy($id);
+            $movieDao->destroy($movie->id);
 
         } else {
-            $message->setMessage("Você não tem permissão para deletar este filme", "error", "index.php");
+
+            $message->setMessage("Informações inválidas!", "error", "index.php");
+
         }
 
     } else {
-        $message->setMessage("Filme não encontrado", "error", "index.php");
+
+        $message->setMessage("Informações inválidas!", "error", "index.php");
+
     }
 
-} else if ($type === "update") {
+} else if($type === "update") {
 
     // Receber os dados dos inputs
     $title = filter_input(INPUT_POST, "title");
@@ -108,9 +114,9 @@ if($type === "create") {
     $length = filter_input(INPUT_POST, "length");
     $id = filter_input(INPUT_POST, "id");
 
-    $movieData = $movieDAO->findById($id);
+    $movieData = $movieDao->findById($id);
 
-    // Verifica se encontrou um filme
+    // Verifica se encontrou o filme
     if($movieData) {
 
         // Verificar se o filme é do usuário
@@ -126,6 +132,7 @@ if($type === "create") {
                 $movieData->category = $category;
                 $movieData->length = $length;
 
+                // Upload de imagem do filme
                 if(isset($_FILES["image"]) && !empty($_FILES["image"]["tmp_name"])) {
 
                     $image = $_FILES["image"];
@@ -159,24 +166,28 @@ if($type === "create") {
 
                 }
 
-                $movieDAO->update($movieData);
+                $movieDao->update($movieData);
 
             } else {
 
-                $message->setMessage("Preencha todos os campos obrigatórios(Titulo, descrição e categoria)", "error", "back");
+                $message->setMessage("Você precisa adicionar pelo menos: título, descrição e categoria!", "error", "back");
 
             }
 
-
         } else {
-            $message->setMessage("Você não tem permissão para editar este filme", "error", "index.php");
+
+            $message->setMessage("Informações inválidas!", "error", "index.php");
+
         }
 
     } else {
-        $message->setMessage("Filme não encontrado", "error", "index.php");
+
+        $message->setMessage("Informações inválidas!", "error", "index.php");
+
     }
 
-
 } else {
-    $message->setMessage("Ação inválida", "error", "index.php");
+
+    $message->setMessage("Informações inválidas!", "error", "index.php");
+
 }

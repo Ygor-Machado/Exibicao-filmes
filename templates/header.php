@@ -1,23 +1,25 @@
 <?php
-    require_once("globals.php");
-    require_once("db.php");
-    require_once("models/Message.php");
-    require_once("dao/UserDAO.php");
 
-    $message = new Message($BASE_URL);
+require_once("globals.php");
+require_once("db.php");
+require_once("models/Message.php");
+require_once("dao/UserDAO.php");
 
-    $flassMessage = $message->getMessage();
+$message = new Message($BASE_URL);
 
-    if(!empty($flassMessage["msg"])) {
-        $message->clearMessage();
-    }
+$flassMessage = $message->getMessage();
 
-    $userDAO = new UserDAO($conn, $BASE_URL);
+if(!empty($flassMessage["msg"])) {
+    // Limpar a mensagem
+    $message->clearMessage();
+}
 
-    $userData = $userDAO->verifyToken(false);
+$userDao = new UserDAO($conn, $BASE_URL);
+
+$userData = $userDao->verifyToken(false);
+
 ?>
-
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -42,7 +44,7 @@
             <i class="fas fa-bars"></i>
         </button>
         <form action="<?= $BASE_URL ?>search.php" method="GET" id="search-form" class="form-inline my-2 my-lg-0">
-            <input name="q" id="search" class="form-control mr-sm-2" type="search" placeholder="Buscar Filmes" aria-label="Search">
+            <input type="text" name="q" id="search" class="form-control mr-sm-2" type="search" placeholder="Buscar Filmes" aria-label="Search">
             <button class="btn my-2 my-sm-0" type="submit">
                 <i class="fas fa-search"></i>
             </button>
@@ -52,20 +54,17 @@
                 <?php if($userData): ?>
                     <li class="nav-item">
                         <a href="<?= $BASE_URL ?>newmovie.php" class="nav-link">
-                            <i class="far fa-plus-square"></i> Incluir filme
+                            <i class="far fa-plus-square"></i> Incluir Filme
                         </a>
                     </li>
-
                     <li class="nav-item">
-                        <a href="<?= $BASE_URL ?>dashboard.php" class="nav-link">Meus filmes</a>
+                        <a href="<?= $BASE_URL ?>dashboard.php" class="nav-link">Meus Filmes</a>
                     </li>
-
                     <li class="nav-item">
                         <a href="<?= $BASE_URL ?>editprofile.php" class="nav-link bold">
                             <?= $userData->name ?>
                         </a>
                     </li>
-
                     <li class="nav-item">
                         <a href="<?= $BASE_URL ?>logout.php" class="nav-link">Sair</a>
                     </li>
@@ -78,10 +77,8 @@
         </div>
     </nav>
 </header>
-
 <?php if(!empty($flassMessage["msg"])): ?>
     <div class="msg-container">
         <p class="msg <?= $flassMessage["type"] ?>"><?= $flassMessage["msg"] ?></p>
     </div>
 <?php endif; ?>
-

@@ -1,16 +1,16 @@
 <?php
-    require_once("templates/header.php");
-    // Verifica se usuário está autenticado
-    require_once("models/User.php");
-    require_once("dao/UserDAO.php");
+require_once("templates/header.php");
 
-    $user = new User();
-    $userDAO = new UserDao($conn, $BASE_URL);
+// Verifica se usuário está autenticado
+require_once("models/User.php");
+require_once("dao/UserDAO.php");
 
-    $userData = $userDAO->verifyToken(true);
+$user = new User();
+$userDao = new UserDao($conn, $BASE_URL);
+
+$userData = $userDao->verifyToken(true);
 
 ?>
-
     <div id="main-container" class="container-fluid">
         <div class="offset-md-4 col-md-4 new-movie-container">
             <h1 class="page-title">Adicionar Filme</h1>
@@ -52,9 +52,6 @@
             </form>
         </div>
     </div>
-
-
-
 <?php
-    require_once("templates/footer.php")
+require_once("templates/footer.php");
 ?>

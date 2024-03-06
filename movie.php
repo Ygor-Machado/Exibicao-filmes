@@ -9,11 +9,11 @@ require_once("dao/ReviewDAO.php");
 // Pegar o id do filme
 $id = filter_input(INPUT_GET, "id");
 
-$movie = null;
+$movie;
 
-$movieDAO = new MovieDAO($conn, $BASE_URL);
+$movieDao = new MovieDAO($conn, $BASE_URL);
 
-$reviewDAO = new ReviewDAO($conn, $BASE_URL);
+$reviewDao = new ReviewDAO($conn, $BASE_URL);
 
 if(empty($id)) {
 
@@ -21,7 +21,7 @@ if(empty($id)) {
 
 } else {
 
-    $movie = $movieDAO->findById($id);
+    $movie = $movieDao->findById($id);
 
     // Verifica se o filme existe
     if(!$movie) {
@@ -47,12 +47,12 @@ if(!empty($userData)) {
     }
 
     // Resgatar as revies do filme
-    $alreadyReviewed = $reviewDAO->hasAlreadyReviewed($id, $userData->id);
+    $alreadyReviewed = $reviewDao->hasAlreadyReviewed($id, $userData->id);
 
 }
 
 // Resgatar as reviews do filme
-$movieReviews = $reviewDAO->getMoviesReview($movie->id);
+$movieReviews = $reviewDao->getMoviesReview($movie->id);
 
 ?>
     <div id="main-container" class="container-fluid">
@@ -64,7 +64,7 @@ $movieReviews = $reviewDAO->getMoviesReview($movie->id);
                     <span class="pipe"></span>
                     <span><?= $movie->category ?></span>
                     <span class="pipe"></span>
-                    <span><i class="fas fa-star"></i> 10</span>
+                    <span><i class="fas fa-star"></i> <?= $movie->rating ?></span>
                 </p>
                 <iframe src="<?= $movie->trailer ?>" width="560" height="315" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encryted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
                 <p><?= $movie->description ?></p>
