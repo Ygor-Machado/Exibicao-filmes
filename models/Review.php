@@ -1,6 +1,6 @@
 <?php
 
-class Review
+#[AllowDynamicProperties] class Review
 {
     public $id;
     public $rating;

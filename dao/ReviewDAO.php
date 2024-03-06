@@ -19,24 +19,66 @@ class ReviewDAO implements ReviewDAOInterface
 
     public function buildReview($data)
     {
-        $review = new Review();
-        $review->id = $data['id'];
-        $review->rating = $data['rating'];
-        $review->review = $data['review'];
-        $review->user_id = $data['user_id'];
-        $review->movies_id = $data['movies_id'];
+        $reviewObject = new Review();
+        $reviewObject->id = $data['id'];
+        $reviewObject->rating = $data['rating'];
+        $reviewObject->review = $data['review'];
+        $reviewObject->users_id = $data['users_id'];
+        $reviewObject->movies_id = $data['movies_id'];
 
-        return $review;
+        return $reviewObject;
     }
 
     public function create(Review $review)
     {
+        $stmt = $this->conn->prepare("INSERT INTO reviews (
+        rating, review, movies_id, users_id
+      ) VALUES (
+        :rating, :review, :movies_id, :users_id
+      )");
 
+        $stmt->bindParam(":rating", $review->rating);
+        $stmt->bindParam(":review", $review->review);
+        $stmt->bindParam(":movies_id", $review->movies_id);
+        $stmt->bindParam(":users_id", $review->user_id);
+
+        $stmt->execute();
+
+        // Mensagem de sucesso por adicionar filme
+        $this->message->setMessage("Crítica adicionada com sucesso!", "success", "index.php");
     }
 
     public function getMoviesReview($id)
     {
+        $reviews = [];
 
+        $stmt = $this->conn->prepare("SELECT * FROM reviews WHERE movies_id = :movies_id");
+
+        $stmt->bindParam(":movies_id", $id);
+
+        $stmt->execute();
+
+        if($stmt->rowCount() > 0) {
+
+            $reviewsData = $stmt->fetchAll();
+
+            $userDAO = new UserDAO($this->conn, $this->url);
+
+            foreach($reviewsData as $review) {
+
+                $reviewObject = $this->buildReview($review);
+
+                // Chamar dados do usuário
+                $user = $userDAO->findById($reviewObject->users_id);
+
+                $reviewObject->user = $user;
+
+                $reviews[] = $reviewObject;
+            }
+
+        }
+
+        return $reviews;
     }
 
     public function hasAlreadyReviewed($id, $userId)
